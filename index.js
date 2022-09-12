@@ -1,155 +1,262 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
-import { Navigation } from 'react-native-navigation';
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  FlatList,
+} from 'react-native';
+import {Navigation} from 'react-native-navigation';
+import store from './src/app/store';
+// import store , {persistor}  from './src/app/store'
+import {Provider} from 'react-redux';
+import {useEffect, useState, useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {getPokemons} from './src/app/reducers';
+import {PersistGate} from 'redux-persist/integration/react';
+import NetInfo from '@react-native-community/netinfo';
+import FastImage from 'react-native-fast-image';
+
+const baseURL = 'https://pokeapi.co/api/v2/pokemon/';
 
 const LoginScreen = () => {
-    return (
-      <View style={styles.root}>
-        <Button
-          title='Login'
-          color='#710ce3'
-          onPress={() => Navigation.setRoot(mainRoot)}
+  const unsubscribe = NetInfo.addEventListener(state => {
+    // console.log("Connection type", state.type);
+    // console.log("Is connected?", state.isConnected);
+  });
+
+  // Unsubscribe
+  unsubscribe();
+
+  NetInfo.fetch().then(state => {
+    // console.log("Connection type", state.type);
+    // console.log("Is connected?", state.isConnected);
+  });
+
+  const dispatch = useDispatch();
+
+  const state = useSelector(state => state);
+  const [searchfeild, setSearchfeild] = useState('');
+  const pokemons = state?.data?.pokemons;
+
+  console.log(pokemons.length);
+
+  useEffect(() => {
+    callPokemons(state?.data?.next ? state?.data?.next : baseURL);
+  }, []);
+
+  searchFun = async item => {
+    setSearchfeild(item);
+  };
+
+  callPokemons = url => {
+    dispatch(getPokemons(url));
+  };
+
+  const keyExtractor = useCallback((item, index) => item._id || `${index}`, []);
+
+  const getItemLayout = useCallback(
+    (data, index) => ({length: 180, offset: 180 * index, index}),
+    [],
+  );
+  return (
+    <View style={styles.root}>
+        <View style={styles.searchCont}>
+          <TextInput
+            style={{backgroundColor:'red' , paddingHorizontal:16 , width:'85%' , alignSelf:'center' , borderRadius:8 , backgroundColor:'white' , borderWidth:1 , borderColor:'#EAEAEA' , marginTop:16}}
+            placeholder="Search Pokemons"
+            onChangeText={value => searchFun(value)}
+            value={searchfeild}
+          />
+
+        <FlatList
+          data={pokemons.filter(pokemon => pokemon.name.includes(searchfeild))}
+          keyExtractor={keyExtractor}
+          initialNumToRender={20}
+          contentContainerStyle={{padding: 16, marginTop: 5 , alignItems:'center' , justifyContent:'center'}}
+          maxToRenderPerBatch={20}
+          showsVerticalScrollIndicator={false}
+          numColumns={2}
+          onEndReachedThreadhold={0.3}
+          getItemLayout={getItemLayout}
+          renderItem={({item}) => (
+            <View
+              style={{
+                height: 180,
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}>
+              <FastImage
+                style={{width: 150, height: 150}}
+                source={{
+                  uri: `https://img.pokemondb.net/sprites/omega-ruby-alpha-sapphire/dex/normal/${item.name}.png`,
+                  priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+              />
+
+              <Text>{item.name}</Text>
+            </View>
+          )}
         />
       </View>
-    );
-  };
-  
-  const HomeScreen = (props) => {
+    </View>
+  );
+};
 
-    React.useEffect(() => {
-        const listener = {
-          componentDidAppear: () => {
-            console.log('RNN', `componentDidAppear`);
-          },
-          componentDidDisappear: () => {
-            console.log('RNN', `componentDidDisappear`);
-          }
-        };
-        // Register the listener to all events related to our component
-        const unsubscribe = Navigation.events().registerComponentListener(listener, props.componentId);
-        return () => {
-          // Make sure to unregister the listener during cleanup
-          unsubscribe.remove();
-        };
-      }, []);
+const HomeScreen = props => {
+  useEffect(() => {}, []);
 
-
-    return (
-      <View style={styles.root}>
-        <Text>Hello React Native Navigation 👋</Text>
-  
-        <Button
-          title='Push Settings Screen'
-          color='#710ce3'
-          onPress={() => Navigation.push(props.componentId, {
-            component: {
-              name: 'Settings'
-            }
-          })} />
+  return (
+    <View style={styles.root}>
+      <View>
+        <View style={styles.searchCont}>
+          <TextInput
+            style={styles.searchfeild}
+            placeholder="Search Pokemons"
+            onChangeText={value => setSearchfeild(value)}
+            value={searchfeild}
+          />
+        </View>
       </View>
-    );
-  };
-  HomeScreen.options = {
-    topBar: {
-      title: {
-        text: 'Home'
-      }
+    </View>
+  );
+};
+HomeScreen.options = {
+  topBar: {
+    title: {
+      text: 'Home',
     },
-    bottomTab: {
-      text: 'Home'
-    }
-  };
-  
-  const SettingsScreen = () => {
-    return (
-      <View style={styles.root}>
-        <Text>Settings Screen</Text>
-      </View>
-    );
-  }
-  SettingsScreen.options = {
-    topBar: {
-      title: {
-        text: 'Settings'
-      }
+  },
+  bottomTab: {
+    text: 'Home',
+  },
+};
+
+const SettingsScreen = () => {
+  return (
+    <View style={styles.root}>
+      <Text>Settings Screen</Text>
+    </View>
+  );
+};
+SettingsScreen.options = {
+  topBar: {
+    title: {
+      text: 'Settings',
     },
-    bottomTab: {
-      text: 'Settings'
-    }
-  }
-  
-  Navigation.registerComponent('Login', () => LoginScreen);
-  Navigation.registerComponent('Home', () => HomeScreen);
-  Navigation.registerComponent('Settings', () => SettingsScreen);
-  
-  const mainRoot = {
-    root: {
-      bottomTabs: {
-        children: [
-          {
-            stack: {
-              children: [
-                {
-                  component: {
-                    name: 'Home'
-                  }
+  },
+  bottomTab: {
+    text: 'Settings',
+  },
+};
+
+Navigation.registerComponent(
+  'Home',
+  () => props =>
+    (
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <HomeScreen {...props} />
+        </PersistGate>
+      </Provider>
+    ),
+  () => 'Home',
+);
+
+Navigation.registerComponent(
+  'Login',
+  () => props =>
+    (
+      <Provider store={store}>
+        {/* <PersistGate loading={null} persistor={persistor}> */}
+        <LoginScreen {...props} />
+        {/* </PersistGate> */}
+      </Provider>
+    ),
+  () => 'Login',
+);
+
+Navigation.registerComponent(
+  'Settings',
+  () => props =>
+    (
+      <PersistGate loading={null} persistor={persistor}>
+        <SettingsScreen {...props} />
+      </PersistGate>
+    ),
+  () => 'Settings',
+);
+
+const mainRoot = {
+  root: {
+    bottomTabs: {
+      children: [
+        {
+          stack: {
+            children: [
+              {
+                component: {
+                  name: 'Home',
                 },
-              ]
-            }
+              },
+            ],
           },
-          {
-            stack: {
-              children: [
-                {
-                  component: {
-                    name: 'Settings'
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  };
-  const loginRoot = {
-    root: {
-      component: {
-        name: 'Login'
-      }
-    }
-  };
-  
-  
-  Navigation.setDefaultOptions({
-    statusBar: {
-      backgroundColor: '#4d089a'
+        },
+        {
+          stack: {
+            children: [
+              {
+                component: {
+                  name: 'Settings',
+                },
+              },
+            ],
+          },
+        },
+      ],
     },
-    topBar: {
-      title: {
-        color: 'white'
-      },
-      backButton: {
-        color: 'white'
-      },
-      background: {
-        color: '#4d089a'
-      }
+  },
+};
+const loginRoot = {
+  root: {
+    component: {
+      name: 'Login',
     },
-    bottomTab: {
-      fontSize: 14,
-      selectedFontSize: 14
-    }
-  });
-  Navigation.events().registerAppLaunchedListener(async () => {
-    Navigation.setRoot(loginRoot);
-  });
-  
-  const styles = StyleSheet.create({
-    root: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'whitesmoke'
-    }
-  });
+  },
+};
+
+Navigation.setDefaultOptions({
+  statusBar: {
+    backgroundColor: '#4d089a',
+  },
+  topBar: {
+    title: {
+      color: 'white',
+    },
+    backButton: {
+      color: 'white',
+    },
+    background: {
+      color: '#4d089a',
+    },
+  },
+  bottomTab: {
+    fontSize: 14,
+    selectedFontSize: 14,
+  },
+});
+Navigation.events().registerAppLaunchedListener(async () => {
+  Navigation.setRoot(loginRoot);
+});
+
+const styles = StyleSheet.create({
+  root: {
+   
+    backgroundColor: 'whitesmoke',
+  },
+});
