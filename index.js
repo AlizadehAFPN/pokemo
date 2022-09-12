@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import {Navigation} from 'react-native-navigation';
-import store from './src/app/store';
-// import store , {persistor}  from './src/app/store'
+// import store from './src/app/store';
+import store, {persistor} from './src/app/store';
 import {Provider} from 'react-redux';
 import {useEffect, useState, useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,7 +23,7 @@ import FastImage from 'react-native-fast-image';
 
 const baseURL = 'https://pokeapi.co/api/v2/pokemon/';
 
-const LoginScreen = () => {
+const LoginScreen = props => {
   const unsubscribe = NetInfo.addEventListener(state => {
     // console.log("Connection type", state.type);
     // console.log("Is connected?", state.isConnected);
@@ -64,26 +65,51 @@ const LoginScreen = () => {
   );
   return (
     <View style={styles.root}>
-        <View style={styles.searchCont}>
-          <TextInput
-            style={{backgroundColor:'red' , paddingHorizontal:16 , width:'85%' , alignSelf:'center' , borderRadius:8 , backgroundColor:'white' , borderWidth:1 , borderColor:'#EAEAEA' , marginTop:16}}
-            placeholder="Search Pokemons"
-            onChangeText={value => searchFun(value)}
-            value={searchfeild}
-          />
+      <View style={styles.searchCont}>
+        <TextInput
+          style={{
+            backgroundColor: 'red',
+            paddingHorizontal: 16,
+            width: '85%',
+            alignSelf: 'center',
+            borderRadius: 8,
+            backgroundColor: 'white',
+            borderWidth: 1,
+            borderColor: '#EAEAEA',
+            marginTop: 16,
+          }}
+          placeholder="Search Pokemons"
+          onChangeText={value => searchFun(value)}
+          value={searchfeild}
+        />
 
         <FlatList
           data={pokemons.filter(pokemon => pokemon.name.includes(searchfeild))}
           keyExtractor={keyExtractor}
           initialNumToRender={20}
-          contentContainerStyle={{padding: 16, marginTop: 5 , alignItems:'center' , justifyContent:'center'}}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            marginTop: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
           maxToRenderPerBatch={20}
           showsVerticalScrollIndicator={false}
           numColumns={2}
           onEndReachedThreadhold={0.3}
           getItemLayout={getItemLayout}
           renderItem={({item}) => (
-            <View
+            <TouchableOpacity
+              onPress={() =>
+                Navigation.push(props.componentId, {
+                  component: {
+                    name: 'Settings', // Push the screen registered with the 'Settings' key
+                    passProps: {
+                      data: item,
+                    },
+                  },
+                })
+              }
               style={{
                 height: 180,
                 justifyContent: 'center',
@@ -100,7 +126,7 @@ const LoginScreen = () => {
               />
 
               <Text>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
@@ -114,14 +140,7 @@ const HomeScreen = props => {
   return (
     <View style={styles.root}>
       <View>
-        <View style={styles.searchCont}>
-          <TextInput
-            style={styles.searchfeild}
-            placeholder="Search Pokemons"
-            onChangeText={value => setSearchfeild(value)}
-            value={searchfeild}
-          />
-        </View>
+        <View style={styles.searchCont}></View>
       </View>
     </View>
   );
@@ -137,10 +156,53 @@ HomeScreen.options = {
   },
 };
 
-const SettingsScreen = () => {
-  return (
-    <View style={styles.root}>
-      <Text>Settings Screen</Text>
+const SettingsScreen = props => {
+  const params = props?.data?.name;
+
+  const [details, setDetails] = useState([]);
+
+  useEffect(() => {
+    fetchPokemonDetails();
+  }, []);
+
+  const fetchPokemonDetails = () => {
+    if (params == undefined) return;
+
+    fetch(`https://pokeapi.co/api/v2/pokemon/${params}`).then(
+      async response => {
+        try {
+          const data = await response.json();
+          setDetails(data);
+        } catch (error) {
+          console.log('Error happened here!');
+          console.error(error);
+        }
+      },
+    );
+  };
+  console.log(details, 'details');
+  return details.name ? (
+    <View style={{flex: 1, alignItems: 'center'}}>
+      <FastImage
+        style={styles.image}
+        source={{
+          uri: `https://img.pokemondb.net/sprites/omega-ruby-alpha-sapphire/dex/normal/${details.name}.png`,
+          priority: FastImage.priority.normal,
+        }}
+        resizeMode={FastImage.resizeMode.contain}
+      />
+
+      <Text style={styles.text}>Name: {details.name}</Text>
+      <Text style={styles.text}>Height: {details.height}</Text>
+      <Text style={styles.text}>Weight: {details.weight}</Text>
+      <Text style={styles.text}>
+        Ability: {details.abilities[0].ability.name}
+      </Text>
+      <Text style={styles.text}>Type: {details.types[0].type.name}</Text>
+    </View>
+  ) : (
+    <View style={styles.indicator}>
+      <ActivityIndicator size="large" color="#E63F34" />
     </View>
   );
 };
@@ -185,9 +247,11 @@ Navigation.registerComponent(
   'Settings',
   () => props =>
     (
-      <PersistGate loading={null} persistor={persistor}>
-        <SettingsScreen {...props} />
-      </PersistGate>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <SettingsScreen {...props} />
+        </PersistGate>
+      </Provider>
     ),
   () => 'Settings',
 );
@@ -196,6 +260,18 @@ const mainRoot = {
   root: {
     bottomTabs: {
       children: [
+        {
+          stack: {
+            children: [
+              {
+                component: {
+                  name: 'Login',
+                },
+              },
+            ],
+          },
+        },
+
         {
           stack: {
             children: [
@@ -222,13 +298,6 @@ const mainRoot = {
     },
   },
 };
-const loginRoot = {
-  root: {
-    component: {
-      name: 'Login',
-    },
-  },
-};
 
 Navigation.setDefaultOptions({
   statusBar: {
@@ -251,12 +320,24 @@ Navigation.setDefaultOptions({
   },
 });
 Navigation.events().registerAppLaunchedListener(async () => {
-  Navigation.setRoot(loginRoot);
+  Navigation.setRoot(mainRoot);
 });
 
 const styles = StyleSheet.create({
   root: {
-   
     backgroundColor: 'whitesmoke',
+  },
+  image: {
+    width: 200,
+    height: 200,
+  },
+  text: {
+    fontSize: 22,
+    marginBottom: 15,
+  },
+  indicator: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
