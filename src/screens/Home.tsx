@@ -12,14 +12,20 @@ import {getPokemons} from '../app/reducers';
 import PokemonCard from '../components/PokemonCard';
 import {baseURL, changeScreen} from '../constant';
 import api from '../api';
+import { AppDispatch } from '../app/store';
+interface Options {
+  options: {
+    topBar: {
+      title:{
+        text:string
+        color:string
+      }
+    }
+  }
+}
 
-
-export interface IRootState {
-data: any;
-} 
-
-const HomeScreen : FC = (props) => {
-  const dispatch = useDispatch();
+const HomeScreen : Options = (props :{componentId:string} ) => {
+  const dispatch = useDispatch<AppDispatch>();
   const pokemons : any = useSelector<IRootState>(state => state?.data?.pokemons);
   const [searchfeild, setSearchfeild] = useState<string>('');
 
@@ -41,7 +47,6 @@ const HomeScreen : FC = (props) => {
 
   const callPokemons = async(url: string) => {
     let {data} = await api.get('/');
-    // @ts-ignore
     // call API through the redux and thunk
     dispatch(getPokemons(data?.count));
   };
@@ -57,7 +62,7 @@ const HomeScreen : FC = (props) => {
     [],
   );
 
-  const getItemLayout = (data: any, index: any) => ({
+  const getItemLayout = (data: any, index: number) => ({
     // optioanl: we'd better set length and offset for better performance
     length: 180,
     offset: 180 * index,
@@ -70,7 +75,7 @@ const HomeScreen : FC = (props) => {
     viewAreaCoveragePercentThreshold: 50,
   };
 
-  const _renderitem = ({item}: any) => (
+  const _renderitem = ({item} :any) => (
     // component for rendereing the pokemon items
     <PokemonCard
       onPress={() => changeScreen(props, item , 'DetailScreen')} // helper function for cleaner code
@@ -81,15 +86,7 @@ const HomeScreen : FC = (props) => {
   return (
     <View style={styles.root}>
       <TextInput
-        style={{
-          paddingHorizontal: 16,
-          width: '85%',
-          alignSelf: 'center',
-          borderRadius: 8,
-          backgroundColor: 'white',
-          borderWidth: 1,
-          borderColor: '#EAEAEA',
-        }}
+        style={styles.mainInput}
         placeholder="Search Pokemons"
         onChangeText={value => searchFun(value)}
         value={searchfeild}
@@ -102,9 +99,7 @@ const HomeScreen : FC = (props) => {
         keyExtractor={keyExtractor}
         removeClippedSubviews
         initialNumToRender={20}
-        contentContainerStyle={{
-          alignItems: 'center',
-        }}
+        contentContainerStyle={styles.containerFlatlist}
         maxToRenderPerBatch={20}
         showsVerticalScrollIndicator={false}
         numColumns={2}
@@ -123,21 +118,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'whitesmoke',
     padding: 16,
   },
-  image: {
-    width: 200,
-    height: 200,
-  },
-  text: {
-    fontSize: 22,
-    marginBottom: 15,
-  },
-  indicator: {
-    flex: 1,
+  containerFlatlist: {
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  mainInput: {
+    paddingHorizontal: 16,
+    width: '100%',
+    alignSelf: 'center',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#EAEAEA',
+    marginBottom:16,
   },
 });
-//@ts-ignore
 HomeScreen.options = {
   topBar: {
     title: {
@@ -146,5 +140,9 @@ HomeScreen.options = {
     },
   },
 };
+
+interface IRootState {
+  data: any;
+} 
 
 export default HomeScreen;

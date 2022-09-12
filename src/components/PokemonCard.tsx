@@ -11,17 +11,13 @@ interface PokemonCardType  {
 
 }
 const PokemonCard = (props: PokemonCardType) => {
+
   return (
     <TouchableOpacity
       onPress={props.onPress}
-      style={{
-        height: 180,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignSelf: 'center',
-      }}>
+      style={styles.mainContainer}>
       <FastImage
-        style={{width: 150, height: 150}}
+        style={styles.mainImage}
         source={{
           uri:imageURL(props?.item?.name),
           priority: FastImage.priority.normal,
@@ -29,27 +25,29 @@ const PokemonCard = (props: PokemonCardType) => {
         resizeMode={FastImage.resizeMode.contain}
       />
 
-      <Text>{props?.item.name}</Text>
+      <Text style={styles.mainText}>{props?.item.name}</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  root: {
-    backgroundColor: 'whitesmoke',
-  },
-  image: {
-    width: 200,
-    height: 200,
-  },
-  text: {
-    fontSize: 22,
-    marginBottom: 15,
-  },
-  indicator: {
-    flex: 1,
+
+  mainContainer: {
+    height: 180,
+    width:'50%' ,
+    minWidth:180,
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: 'center',
+    borderRadius:8,
+    borderWidth:1,
+    borderColor:'#EAEAEA',
+  },
+  mainImage: {width: 120, height: 120},
+  mainText: {
+    color:'black',
+    fontSize:16,
+    lineHeight:20
   },
 });
 

@@ -8,7 +8,7 @@ export const baseURL = 'https://pokeapi.co/api/v2/pokemon/';
 export const imageURL = (name: string) =>
   `https://img.pokemondb.net/sprites/omega-ruby-alpha-sapphire/dex/normal/${name}.png`;
 
-export const changeScreen = (props: any, item: any , name:string) =>
+export const changeScreen = (props: IProps, item: any , name:string) =>
   Navigation.push(props.componentId, {
     component: {
       name, // Push the screen registered with the 'Settings' key
@@ -25,6 +25,10 @@ export const changeScreen = (props: any, item: any , name:string) =>
       },
     },
 });
+
+interface IProps {
+  componentId:string
+}
 
 // export const createScreen = (Item : FC,name:string ) => (
 //   Navigation.registerComponent(

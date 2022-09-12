@@ -1,35 +1,27 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
+import React, {FC, ReactNode, useEffect, useState} from 'react';
 import FastImage from 'react-native-fast-image';
-import { baseURL, imageURL } from '../constant';
+import {baseURL, imageURL} from '../constant';
 import api from '../api';
 
 interface DetailType {
-    componentId:string
-    data:{
-      name:string;
-      url:string
-    }
-   
+  componentId: string;
+  data: {
+    name: string;
+    url: string;
+  };
 }
 interface Options {
   options: {
     topBar: {
-      title:{
-        color:string
-      }
-    }
-  }
+      title: {
+        color: string;
+      };
+    };
+  };
 }
 
-const DetailScreen : Options = (props: DetailType) => {
-
-  console.log(props)
+const DetailScreen: Options = (props: DetailType) => {
   const params = props?.data?.name;
 
   const [details, setDetails] = useState<any>([]);
@@ -38,12 +30,11 @@ const DetailScreen : Options = (props: DetailType) => {
     fetchPokemonDetails();
   }, []);
 
-  const fetchPokemonDetails = async() => {
+  const fetchPokemonDetails = async () => {
     if (params == undefined) return;
-    const {data} = await api.get(`${baseURL}${params}`)
+    const {data} = await api.get(`${baseURL}${params}`);
     setDetails(data);
   };
-
 
   return details.name ? (
     <View style={{flex: 1, alignItems: 'center'}}>
@@ -68,7 +59,6 @@ const DetailScreen : Options = (props: DetailType) => {
     <View style={styles.indicator}>
       <ActivityIndicator size="large" color="#E63F34" />
     </View>
-  
   );
 };
 
@@ -94,10 +84,9 @@ const styles = StyleSheet.create({
 DetailScreen.options = {
   topBar: {
     title: {
-      color: 'white'
+      color: 'white',
     },
   },
 };
 
 export default DetailScreen;
-
