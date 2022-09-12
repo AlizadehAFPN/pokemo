@@ -5,28 +5,17 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import HomeScreen from './src/screens/Home'
 import DetailScreen from './src/screens/Detail'
+import Root from './src/Root';
 
+// Defining Home screen connected to redux and persisted for preventing multipe API call
 Navigation.registerComponent(
-  'Home',
+  'HomeScreen',
   () => props =>
-    (
+    ( 
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <HomeScreen {...props} />
         </PersistGate>
-      </Provider>
-    ),
-  () => 'Home',
-);
-
-Navigation.registerComponent(
-  'HomeScreen',
-  () => props =>
-    (
-      <Provider store={store}>
-        {/* <PersistGate loading={null} persistor={persistor}> */}
-        <HomeScreen {...props} />
-        {/* </PersistGate> */}
       </Provider>
     ),
   () => 'HomeScreen',
@@ -37,43 +26,11 @@ Navigation.registerComponent(
   () => props =>
     (
       <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
           <DetailScreen {...props} />
-        </PersistGate>
       </Provider>
     ),
   () => 'DetailScreen',
 );
-
-const mainRoot = {
-  root: {
-      children: [
-        {
-          stack: {
-            children: [
-              {
-                component: {
-                  name: 'HomeScreen',
-                },
-              },
-            ],
-          },
-        },
-
-        {
-          stack: {
-            children: [
-              {
-                component: {
-                  name: 'DetailScreen',
-                },
-              },
-            ],
-          },
-        },
-      ],
-  },
-};
 
 Navigation.setDefaultOptions({
   statusBar: {
@@ -81,6 +38,7 @@ Navigation.setDefaultOptions({
   },
   topBar: {
     title: {
+      text:'Pokemons List',
       color: 'white',
     },
     backButton: {
@@ -91,38 +49,12 @@ Navigation.setDefaultOptions({
     },
   },
 });
+
 Navigation.events().registerAppLaunchedListener(async () => {
-  Navigation.setRoot(loginRoot);
+  Navigation.setRoot(Root);
 });
-DetailScreen.options = {
-  topBar: {
-    title: {
-      text: 'DetailScreen',
-    },
-  },
-  bottomTab: {
-    text: 'DetailScreen',
-  },
-};
 
-const loginRoot = {
-  root: {
-    stack: {
-      children: [
-        {
-          component: {
-            name: 'DetailScreen',
-          },
-          component : {
-            name: 'HomeScreen'
-          }
-        }
-      ]
-    }
 
-  
-  }
-};
 
 
 
