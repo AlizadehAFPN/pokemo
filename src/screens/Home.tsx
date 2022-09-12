@@ -13,16 +13,15 @@ import PokemonCard from '../components/PokemonCard';
 import {baseURL, changeScreen} from '../constant';
 import api from '../api';
 
-interface Home {
-  searchfeild: string;
-}
 
-const HomeScreen : FC<Home> = (props) => {
+export interface IRootState {
+data: any;
+} 
+
+const HomeScreen : FC = (props) => {
   const dispatch = useDispatch();
-  //@ts-ignore
-  const pokemons  = useSelector(state => state?.data?.pokemons);
-  const [searchfeild, setSearchfeild] = useState('');
-  const [limit, setLimit] = useState(20);
+  const pokemons : any = useSelector<IRootState>(state => state?.data?.pokemons);
+  const [searchfeild, setSearchfeild] = useState<string>('');
 
   useEffect(() => {
     // check if we've persisted pokemons before or not

@@ -4,11 +4,32 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import FastImage from 'react-native-fast-image';
 import { imageURL } from '../constant';
 
-const DetailScreen = (props:any) => {
+interface DetailType {
+    componentId:string
+    data:{
+      name:string;
+      url:string
+    }
+   
+}
+
+interface Options {
+  options: {
+    topBar: {
+      title:{
+        color:string
+      }
+    }
+  }
+}
+
+const DetailScreen : Options = (props: DetailType) => {
+
+  console.log(props)
   const params = props?.data?.name;
 
   const [details, setDetails] = useState<any>([]);
@@ -83,7 +104,6 @@ const styles = StyleSheet.create({
 DetailScreen.options = {
   topBar: {
     title: {
-      text: 'DetailScreen',
       color: 'white'
     },
   },

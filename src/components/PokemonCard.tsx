@@ -1,11 +1,16 @@
-import {Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {Text, TouchableOpacity, StyleSheet, GestureResponderEvent} from 'react-native';
 import React, {
   memo,
 } from 'react';
 import FastImage from 'react-native-fast-image';
 import { imageURL } from '../constant';
 
-const PokemonCard = (props: any) => {
+interface PokemonCardType  {
+  item: {name:string ; url:string};
+  onPress: ((event: GestureResponderEvent) => void) ;
+
+}
+const PokemonCard = (props: PokemonCardType) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
