@@ -1,28 +1,26 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
+import api from '../api';
+import { baseURL } from '../constant';
 
 export const getPokemons = createAsyncThunk(
   'pokemons/getPokemons',
-  async url => {
-    const response = await axios.get(url, {
-      params: {
-        limit:1154,
-      }}
-        );
-
+  async (limit:number) => {
+    const response = await api.get(`${baseURL}?limit=${limit}`);
     return response.data;
   },
 );
+
 export const pokemonsSlice = createSlice({
   name: 'pokemons',
   initialState: {
     data: {
-      next:'',
-      previous:'',
-      pokemons:[],
+      next: '',
+      previous: '',
+      pokemons: [],
     },
     loading: 'idle',
-    error: null,
+    error: '',
   },
   reducers: {},
   extraReducers: builder => {
@@ -50,4 +48,5 @@ export const pokemonsSlice = createSlice({
     });
   },
 });
+
 export default pokemonsSlice.reducer;
