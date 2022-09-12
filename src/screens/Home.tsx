@@ -94,7 +94,7 @@ const HomeScreen : Options = (props :{componentId:string} ) => {
       {/* we can also use receycleview. better to also use this and compare the result */}
       <FlatList
         data={pokemons.filter((pokemon: {name: string | string[]}) =>
-          pokemon.name.includes(searchfeild),
+          pokemon.name.includes(searchfeild.toLowerCase()),
         )}
         keyExtractor={keyExtractor}
         removeClippedSubviews
