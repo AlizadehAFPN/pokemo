@@ -6,7 +6,8 @@ import {
 } from 'react-native';
 import React, {FC, useEffect, useState} from 'react';
 import FastImage from 'react-native-fast-image';
-import { imageURL } from '../constant';
+import { baseURL, imageURL } from '../constant';
+import api from '../api';
 
 interface DetailType {
     componentId:string
@@ -16,7 +17,6 @@ interface DetailType {
     }
    
 }
-
 interface Options {
   options: {
     topBar: {
@@ -38,20 +38,10 @@ const DetailScreen : Options = (props: DetailType) => {
     fetchPokemonDetails();
   }, []);
 
-  const fetchPokemonDetails = () => {
+  const fetchPokemonDetails = async() => {
     if (params == undefined) return;
-
-    fetch(`https://pokeapi.co/api/v2/pokemon/${params}`).then(
-      async response => {
-        try {
-          const data = await response.json();
-          setDetails(data);
-        } catch (error) {
-          console.log('Error happened here!');
-          console.error(error);
-        }
-      },
-    );
+    const {data} = await api.get(`${baseURL}${params}`)
+    setDetails(data);
   };
 
 
