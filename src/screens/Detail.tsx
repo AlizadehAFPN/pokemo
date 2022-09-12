@@ -3,7 +3,6 @@ import React, {FC, ReactNode, useEffect, useState} from 'react';
 import FastImage from 'react-native-fast-image';
 import {baseURL, imageURL} from '../constant';
 import api from '../api';
-
 interface DetailType {
   componentId: string;
   data: {
@@ -23,16 +22,18 @@ interface Options {
 }
 
 const DetailScreen: Options = (props: DetailType) => {
+  //  params sent from the home screen
   const params = props?.data?.name;
-
   const [details, setDetails] = useState<any>([]);
 
   useEffect(() => {
+    //  fetch details of the pokemon from the API 
     fetchPokemonDetails();
   }, []);
 
   const fetchPokemonDetails = async () => {
     if (params == undefined) return;
+    // get data from API
     const {data} = await api.get(`${baseURL}${params}`);
     setDetails(data);
   };

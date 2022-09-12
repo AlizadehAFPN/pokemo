@@ -2,6 +2,8 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import api from '../api';
 import { baseURL } from '../constant';
 
+// Add redux-thunk to API
+
 export const getPokemons = createAsyncThunk(
   'pokemons/getPokemons',
   async (limit:number) => {
@@ -10,6 +12,7 @@ export const getPokemons = createAsyncThunk(
   },
 );
 
+// main Slice of redux toolkit
 export const pokemonsSlice = createSlice({
   name: 'pokemons',
   initialState: {
@@ -22,6 +25,9 @@ export const pokemonsSlice = createSlice({
     error: '',
   },
   reducers: {},
+
+  // extra reducer for applying redux-thunk. 
+
   extraReducers: builder => {
     builder.addCase(getPokemons.pending, (state, action) => {
       if (state.loading === 'idle') {

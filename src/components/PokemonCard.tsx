@@ -5,6 +5,7 @@ import React, {
 import FastImage from 'react-native-fast-image';
 import { imageURL } from '../constant';
 
+// interface of params
 interface PokemonCardType  {
   item: {name:string ; url:string};
   onPress: ((event: GestureResponderEvent) => void) ;
@@ -16,6 +17,7 @@ const PokemonCard = (props: PokemonCardType) => {
     <TouchableOpacity
       onPress={props.onPress}
       style={styles.mainContainer}>
+{/* fast image is used for better rendering and caching  */}
       <FastImage
         style={styles.mainImage}
         source={{
@@ -50,5 +52,5 @@ const styles = StyleSheet.create({
     lineHeight:20
   },
 });
-
+// use react memo for caching data and avoid lots of rerencering
 export default memo(PokemonCard);

@@ -32,13 +32,14 @@ Navigation.registerComponent(
   () => 'DetailScreen',
 );
 
+// Default configs for all the screens
 Navigation.setDefaultOptions({
   statusBar: {
     backgroundColor: '#4d089a',
   },
   topBar: {
     title: {
-      text:'',
+      text:'Pokemons ',
       color: 'white',
     },
     backButton: {
@@ -49,7 +50,8 @@ Navigation.setDefaultOptions({
     },
   },
 });
-
+// Add the new screen to Root js file and make sure the component name is the same as the name of the registerComponent
+ 
 Navigation.events().registerAppLaunchedListener(async () => {
   Navigation.setRoot(Root);
 });
