@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#EAEAEA',
     marginBottom:16,
+    height:50
   },
 });
 HomeScreen.options = {

@@ -26,7 +26,7 @@ Navigation.registerComponent(
   () => props =>
     (
       <Provider store={store}>
-          <DetailScreen {...props} />
+          <DetailScreen setDefaultOptions={topBar={title:{text:'hiiii'}}} {...props} />
       </Provider>
     ),
   () => 'DetailScreen',
@@ -38,7 +38,7 @@ Navigation.setDefaultOptions({
   },
   topBar: {
     title: {
-      text:'Pokemons List',
+      text:'',
       color: 'white',
     },
     backButton: {

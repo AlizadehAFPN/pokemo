@@ -15,6 +15,7 @@ interface Options {
   options: {
     topBar: {
       title: {
+        text:string
         color: string;
       };
     };
@@ -84,6 +85,7 @@ const styles = StyleSheet.create({
 DetailScreen.options = {
   topBar: {
     title: {
+      text:'',
       color: 'white',
     },
   },
